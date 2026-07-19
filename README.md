@@ -73,27 +73,6 @@ Bangladesh's agricultural GDP contribution stands at **11.5%**, yet the sector s
 
 ---
 
-## 🚀 Local Installation
-
-### 1. Clone the repository
-```bash
-git clone https://github.com/imamdoula004/KrishiLink-Promo-Webpage.git
-cd KrishiLink-Promo-Webpage
-```
-
-### 2. Install dependencies
-```bash
-npm install
-```
-
-### 3. Run development server
-```bash
-npm run dev
-```
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
----
-
 ## 📈 Projections & Sandbox Scope
 > [!NOTE]
 > This repository represents a prototype showcase. All transactional data, yield improvements, and satellite telemetry overlays represent simulated sandboxes and projected targets.
