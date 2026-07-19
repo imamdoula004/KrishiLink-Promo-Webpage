@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
-import { User, MapPin, Sprout, Building, Mail, FileText, CheckCircle, Shield, Sparkles, Check, Globe } from "lucide-react";
+import { User, MapPin, Sprout, Building, Mail, FileText, CheckCircle, Shield, Sparkles, Check, Globe, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,14 +18,26 @@ export default function JoinPage() {
   // Form states
   const [farmerStep, setFarmerStep] = useState(1);
   const [farmerName, setFarmerName] = useState("");
+  const [farmerPhone, setFarmerPhone] = useState("");
   const [farmerRegion, setFarmerRegion] = useState("Rajshahi");
   const [farmerCrop, setFarmerCrop] = useState("");
   const [farmerSubmitted, setFarmerSubmitted] = useState(false);
+  const [farmerSubmitting, setFarmerSubmitting] = useState(false);
 
   const [buyerCompany, setBuyerCompany] = useState("");
   const [buyerEmail, setBuyerEmail] = useState("");
   const [buyerReqs, setBuyerReqs] = useState("");
   const [buyerSubmitted, setBuyerSubmitted] = useState(false);
+  const [buyerSubmitting, setBuyerSubmitting] = useState(false);
+
+  // Survey states
+  const [surveyRole, setSurveyRole] = useState("Farmer");
+  const [hasSmartphone, setHasSmartphone] = useState("Yes");
+  const [preferBangla, setPreferBangla] = useState("Yes");
+  const [tradeMiddlemen, setTradeMiddlemen] = useState("Yes");
+  const [willingToBetaTest, setWillingToBetaTest] = useState("Yes");
+  const [surveySubmitted, setSurveySubmitted] = useState(false);
+  const [surveySubmitting, setSurveySubmitting] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,8 +54,9 @@ export default function JoinPage() {
     if (farmerStep < 3) {
       setFarmerStep(farmerStep + 1);
     } else {
+      setFarmerSubmitting(true);
       try {
-        await fetch("https://formsubmit.co/ajax/imamshadin004@gmail.com", {
+        await fetch("/api/submit", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -52,6 +65,7 @@ export default function JoinPage() {
           body: JSON.stringify({
             FormType: "Farmer Waitlist",
             FarmerName: farmerName,
+            FarmerPhone: farmerPhone,
             FarmerRegion: farmerRegion,
             PrimaryCrop: farmerCrop
           })
@@ -59,14 +73,16 @@ export default function JoinPage() {
       } catch (err) {
         console.error(err);
       }
+      setFarmerSubmitting(false);
       setFarmerSubmitted(true);
     }
   };
 
   const handleBuyerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setBuyerSubmitting(true);
     try {
-      await fetch("https://formsubmit.co/ajax/imamshadin004@gmail.com", {
+      await fetch("/api/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -82,7 +98,34 @@ export default function JoinPage() {
     } catch (err) {
       console.error(err);
     }
+    setBuyerSubmitting(false);
     setBuyerSubmitted(true);
+  };
+
+  const handleSurveySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSurveySubmitting(true);
+    try {
+      await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          FormType: "Survey Response",
+          Role: surveyRole,
+          HasSmartphone: hasSmartphone,
+          PreferBangla: preferBangla,
+          TradeMiddlemen: tradeMiddlemen,
+          WillingToBetaTest: willingToBetaTest
+        })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    setSurveySubmitting(false);
+    setSurveySubmitted(true);
   };
 
   // Animation variants
@@ -119,7 +162,7 @@ export default function JoinPage() {
         </div>
 
         {/* Bento Forms Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch mb-24">
           
           {/* Farmer Form (Left) */}
           <motion.div 
@@ -172,16 +215,29 @@ export default function JoinPage() {
                   {/* Form step fields */}
                   <div className="py-4">
                     {farmerStep === 1 && (
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase font-label-bold text-[#414944] block font-bold">Full Name</label>
-                        <input 
-                          required
-                          value={farmerName}
-                          onChange={(e) => setFarmerName(e.target.value)}
-                          className="w-full bg-white/60 border-b border-[#c0c8c3] focus:border-[#3d6a00] focus:ring-0 px-4 py-3.5 text-base rounded-t-xl transition-all outline-none" 
-                          placeholder="e.g. Abul Kashem" 
-                          type="text"
-                        />
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <label className="text-xs uppercase font-label-bold text-[#414944] block font-bold">Full Name</label>
+                          <input 
+                            required
+                            value={farmerName}
+                            onChange={(e) => setFarmerName(e.target.value)}
+                            className="w-full bg-white/60 border-b border-[#c0c8c3] focus:border-[#3d6a00] focus:ring-0 px-4 py-3.5 text-base rounded-t-xl transition-all outline-none" 
+                            placeholder="e.g. Abul Kashem" 
+                            type="text"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs uppercase font-label-bold text-[#414944] block font-bold">Phone Number</label>
+                          <input 
+                            required
+                            value={farmerPhone}
+                            onChange={(e) => setFarmerPhone(e.target.value)}
+                            className="w-full bg-white/60 border-b border-[#c0c8c3] focus:border-[#3d6a00] focus:ring-0 px-4 py-3.5 text-base rounded-t-xl transition-all outline-none" 
+                            placeholder="e.g. +880 1712-345678" 
+                            type="tel"
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -219,9 +275,10 @@ export default function JoinPage() {
 
                   <button 
                     type="submit"
-                    className="w-full py-4 bg-[#3d6a00] text-white rounded-2xl font-label-bold text-xs uppercase tracking-widest hover:bg-[#00261a] transition-all hover:shadow-[0_0_20px_rgba(61,106,0,0.3)] font-bold"
+                    disabled={farmerSubmitting}
+                    className="w-full py-4 bg-[#3d6a00] text-white rounded-2xl font-label-bold text-xs uppercase tracking-widest hover:bg-[#00261a] transition-all hover:shadow-[0_0_20px_rgba(61,106,0,0.3)] font-bold disabled:opacity-50"
                   >
-                    {farmerStep < 3 ? "Next Step" : "Claim Early Access"}
+                    {farmerSubmitting ? "Submitting..." : farmerStep < 3 ? "Next Step" : "Claim Early Access"}
                   </button>
                 </form>
               )}
@@ -329,9 +386,10 @@ export default function JoinPage() {
                     </div>
                     <button 
                       type="submit"
-                      className="w-full py-4 bg-[#aff763] text-[#0f2000] rounded-xl font-label-bold text-xs uppercase tracking-widest hover:bg-white transition-all shadow-md font-bold"
+                      disabled={buyerSubmitting}
+                      className="w-full py-4 bg-[#aff763] text-[#0f2000] rounded-xl font-label-bold text-xs uppercase tracking-widest hover:bg-white transition-all shadow-md font-bold disabled:opacity-50"
                     >
-                      Request Partnership Proposal
+                      {buyerSubmitting ? "Sending..." : "Request Partnership Proposal"}
                     </button>
                   </form>
                 )}
@@ -352,6 +410,163 @@ export default function JoinPage() {
                   </div>
                 </div>
 
+              </div>
+
+            </div>
+          </motion.div>
+
+          {/* Survey Form (Third Column) */}
+          <motion.div 
+            {...fadeInUp}
+            transition={{ delay: 0.2 }}
+            className="relative group animate-fade-in"
+          >
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#aff763] to-[#beedd7] rounded-[2.5rem] blur opacity-15 group-hover:opacity-25 transition duration-1000" />
+            <div className="relative glass-panel rounded-[2.5rem] overflow-hidden p-8 md:p-10 flex flex-col h-full border border-white/40 shadow-xl bg-white/20 justify-between">
+              
+              <div>
+                <div className="mb-6">
+                  <span className="inline-block px-4 py-1.5 rounded-full bg-[#aff763] text-[#0f2000] text-xs font-label-bold mb-4 uppercase tracking-widest font-bold">
+                    Quick Survey
+                  </span>
+                  <h2 className="text-2xl md:text-3xl font-headline-lg text-[#00261a] mb-2 font-bold flex items-center gap-2">
+                    <HelpCircle className="w-6 h-6 text-[#3d6a00]" /> Feasibility
+                  </h2>
+                  <p className="text-xs md:text-sm text-[#414944] leading-relaxed">
+                    Help us profile deployment parameters to launch KrishiLink quickly and efficiently in your region.
+                  </p>
+                </div>
+
+                {surveySubmitted ? (
+                  <div className="bg-[#beedd7]/30 p-6 rounded-3xl border border-[#3d6a00]/25 text-center flex flex-col justify-center items-center min-h-[300px]">
+                    <CheckCircle className="w-12 h-12 text-[#3d6a00] mb-4 animate-bounce" />
+                    <h4 className="text-lg font-headline-md text-[#00261a] mb-2 font-bold">Survey Submitted!</h4>
+                    <p className="text-xs md:text-sm text-[#414944] leading-relaxed">
+                      Thank you! Your feedback directly optimizes our local hub logistics routing and offline localization parameters.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSurveySubmit} className="space-y-4">
+                    {/* Q1: Role Selection */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] uppercase font-label-bold text-[#414944] block font-bold">I am joining as a</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {["Farmer", "Buyer", "Logistics", "Other"].map((role) => (
+                          <button
+                            key={role}
+                            type="button"
+                            onClick={() => setSurveyRole(role)}
+                            className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border ${
+                              surveyRole === role 
+                                ? "bg-[#3d6a00] text-white border-[#3d6a00] shadow-sm" 
+                                : "bg-white/50 text-[#414944] border-[#c0c8c3]/40 hover:bg-white/80"
+                            }`}
+                          >
+                            {role}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Q2: Smartphone */}
+                    <div className="flex items-center justify-between p-3 bg-white/40 rounded-xl border border-[#c0c8c3]/10">
+                      <span className="text-xs font-bold text-[#1b1c17]">Has smartphone & internet?</span>
+                      <div className="flex gap-1.5">
+                        {["Yes", "No"].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setHasSmartphone(opt)}
+                            className={`py-1 px-3 rounded-lg text-xs font-bold transition-all ${
+                              hasSmartphone === opt 
+                                ? "bg-[#3d6a00] text-white" 
+                                : "bg-white/30 text-[#414944] hover:bg-white/60"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Q3: Bangla Interface */}
+                    <div className="flex items-center justify-between p-3 bg-white/40 rounded-xl border border-[#c0c8c3]/10">
+                      <span className="text-xs font-bold text-[#1b1c17]">Prefer app in Bangla?</span>
+                      <div className="flex gap-1.5">
+                        {["Yes", "No"].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setPreferBangla(opt)}
+                            className={`py-1 px-3 rounded-lg text-xs font-bold transition-all ${
+                              preferBangla === opt 
+                                ? "bg-[#3d6a00] text-white" 
+                                : "bg-white/30 text-[#414944] hover:bg-white/60"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Q4: Middlemen */}
+                    <div className="flex items-center justify-between p-3 bg-white/40 rounded-xl border border-[#c0c8c3]/10">
+                      <span className="text-xs font-bold text-[#1b1c17]">Trade through middlemen?</span>
+                      <div className="flex gap-1.5">
+                        {["Yes", "No"].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setTradeMiddlemen(opt)}
+                            className={`py-1 px-3 rounded-lg text-xs font-bold transition-all ${
+                              tradeMiddlemen === opt 
+                                ? "bg-[#3d6a00] text-white" 
+                                : "bg-white/30 text-[#414944] hover:bg-white/60"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Q5: Beta Test */}
+                    <div className="flex items-center justify-between p-3 bg-white/40 rounded-xl border border-[#c0c8c3]/10">
+                      <span className="text-xs font-bold text-[#1b1c17]">Join a 10-min test?</span>
+                      <div className="flex gap-1.5">
+                        {["Yes", "No"].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setWillingToBetaTest(opt)}
+                            className={`py-1 px-3 rounded-lg text-xs font-bold transition-all ${
+                              willingToBetaTest === opt 
+                                ? "bg-[#3d6a00] text-white" 
+                                : "bg-white/30 text-[#414944] hover:bg-white/60"
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <button 
+                      type="submit"
+                      disabled={surveySubmitting}
+                      className="w-full py-3.5 bg-[#00261a] text-white rounded-xl font-label-bold text-xs uppercase tracking-widest hover:bg-[#3d6a00] transition-all hover:shadow-[0_0_20px_rgba(0,38,26,0.2)] font-bold disabled:opacity-50"
+                    >
+                      {surveySubmitting ? "Submitting..." : "Submit Answers"}
+                    </button>
+                  </form>
+                )}
+              </div>
+
+              {/* Data sync indicator */}
+              <div className="mt-5 border-t border-[#c0c8c3]/20 pt-4 flex items-center justify-center gap-1.5 opacity-60">
+                <span className="w-1.5 h-1.5 bg-[#3d6a00] rounded-full animate-pulse" />
+                <span className="text-[10px] font-bold text-[#1b1c17] uppercase tracking-wider">Syncs to Google Sheets</span>
               </div>
 
             </div>

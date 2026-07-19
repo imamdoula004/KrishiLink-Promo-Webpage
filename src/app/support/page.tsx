@@ -50,13 +50,19 @@ export default function SupportPage() {
     setIsSubmitting(true);
     setSubmitStatus("idle");
     try {
-      const response = await fetch("https://formsubmit.co/ajax/imamshadin004@gmail.com", {
+      const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+          FormType: "Support Inquiry",
+          Name: formData.name,
+          Email: formData.email,
+          Subject: formData.subject,
+          Message: formData.message
+        })
       });
       if (response.ok) {
         setSubmitStatus("success");
